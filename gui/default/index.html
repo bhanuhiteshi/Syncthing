@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<!--
+// Copyright (C) 2014 The Syncthing Authors.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this file,
+// You can obtain one at https://mozilla.org/MPL/2.0/.
+
+-->
+<html lang="en" ng-app="syncthing" ng-controller="SyncthingController" class="ng-cloak">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content=""/>
+  <meta name="author" content=""/>
+  <link rel="shortcut icon" href="assets/img/favicon-{{syncthingStatus()}}.png"/>
+  <link rel="mask-icon" href="assets/img/safari-pinned-tab.svg" color="#0882c8"/>
+
+  <title ng-bind="thisDeviceName() + ' | Syncthing'"></title>
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="vendor/bootstrap/css/daterangepicker.css" rel="stylesheet"/>
+  <link href="assets/font/raleway.css" rel="stylesheet"/>
+  <link href="vendor/font-awesome/css/font-awesome.css" rel="stylesheet"/>
+  <link href="assets/css/overrides.css" rel="stylesheet"/>
+  <link href="assets/css/theme.css" rel="stylesheet"/>
+  <link href="assets/css/nav.css" rel="stylesheet"/>
+  <link href="vendor/fancytree/css/ui.fancytree.css" rel="stylesheet"/>
+</head>
+
+<body>
+  <script type="text/javascript" src="syncthing/development/logbar.js"></script>
+  <div ng-if="version.isDevelopmentVersion" ng-include="'syncthing/development/logbar.html'"></div>
+  <!-- Top bar -->
+<section>
+    <header>
+        <nav class="navbar navbar-fixed-left navbar-minimal animate" role="navigation">
+                <div class="navbar-toggler animate">
+                                <span class="menu-icon"></span>
+                        </div>
+                <ul class="nav navbar-menu animate">
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">About / Version</a></li>
+                    <li><a href="#">Contact Support</a></li>
+                </ul>
+        </nav>
+        <div  class="navbar-brand text-center">
+            <h3>Symply<span class="fnt-500">Conveyor</span></h3>
+        </div>
+            <div class="right-button">
+                <a href="#myModal" data-toggle="modal" data-target="#myModal"><img src="assets/img/plus-btn.png" class="img-fluid"></a>
+            </div>
+            <!--modal strats-->
+            <div class="modal" id="myModal" role="dialog">
+            	<div class="modal-dialog modal-md">
+                      <div class="modal-content add-modal">
+                        <div class="modal-header brdr-btm-non">
+                          <p class="st-hd">Settings</p>
+                          
+                        </div>
+                        <div class="modal-body">
+                        	<div class="form-group srch-frm">
+                                <label>Search</label>
+                                <input type="text">
+                            </div>
+                            <div class="file-manager">
+                            	<div class="arrow-bg">
+                                	<img src="assets/img/bg-arrow1.png" class="img-fluid">
+                                </div>
+                            	<div style="height: 16px; line-height: 16px">&nbsp;</div>
+                                <div id="fileTreeDemo_1" class="demoto">
+                                </div>
+                                <div class="form-group select-btn">
+                                	<input type="submit" value="Select">
+                                </div>
+                            </div>
+                        </div>
+                       
+                </div>
+            </div>
+            <!--modal ends-->
+    </header>
+</section>
+  <!--
+  <nav class="navbar navbar-top navbar-default" role="navigation">
+    <div class="container">
+      <span class="navbar-brand" aria-hidden="true">
+        <img class="logo hidden-xs" src="assets/img/logo-horizontal.svg" height="32" width="117" alt=""/>
+        <img class="logo hidden visible-xs" src="assets/img/favicon-default.png" height="32" alt=""/>
+      </span>
+      <p class="navbar-text hidden-xs" ng-class="{'hidden-sm':upgradeInfo && upgradeInfo.newer}">{{thisDeviceIP()}}</p>
+      <ul class="nav navbar-nav navbar-right">
+        <li ng-if="upgradeInfo && upgradeInfo.newer" class="upgrade-newer">
+          <button type="button" class="btn navbar-btn btn-primary btn-sm" ng-click="upgrade()">
+            <span class="fa fa-arrow-circle-up"></span>
+            <span class="hidden-xs" translate translate-value-version="{{upgradeInfo.latest}}">Upgrade To {%version%}</span>
+          </button>
+        </li>
+        <li ng-if="upgradeInfo && upgradeInfo.majorNewer" class="upgrade-newer-major">
+          <button type="button" class="btn navbar-btn btn-danger btn-sm" data-toggle="modal" data-target="#majorUpgrade">
+            <span class="fa fa-arrow-circle-up"></span>
+            <span class="hidden-xs" translate translate-value-version="{{upgradeInfo.latest}}">Upgrade To {%version%}</span>
+          </button>
+        </li>
+        <li class="dropdown" language-select></li>
+        <li>
+          <a class="navbar-link" href="https://docs.syncthing.net/intro/gui.html" target="_blank">
+            <span class="fa fa-question-circle"></span>
+            <span class="hidden-xs" translate>Help</span>
+          </a>
+        </li>
+        <li class="dropdown action-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="fa fa-cog"></span>
+            <span class="hidden-xs" translate>Actions</span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="" ng-click="editSettings()"><span class="fa fa-fw fa-cog"></span>&nbsp;<span translate>Settings</span></a></li>
+            <li><a href="" data-toggle="modal" data-target="#idqr" ng-click="currentDevice=thisDevice()"><span class="fa fa-fw fa-qrcode"></span>&nbsp;<span translate>Show ID</span></a></li>
+            <li class="divider" aria-hidden="true"></li>
+            <li><a href="" ng-click="shutdown()"><span class="fa fa-fw fa-power-off"></span>&nbsp;<span translate>Shutdown</span></a></li>
+            <li><a href="" ng-click="restart()"><span class="fa fa-fw fa-refresh"></span>&nbsp;<span translate>Restart</span></a></li>
+            <li class="divider" aria-hidden="true"></li>
+            <li class="visible-xs">
+              <a href="https://docs.syncthing.net/intro/gui.html" target="_blank">
+                <span class="fa fa-fw fa-book"></span>&nbsp;<span translate>Help</span>
+              </a>
+            </li>
+            <li><a href="" data-toggle="modal" data-target="#about"><span class="fa fa-fw fa-heart-o"></span>&nbsp;<span translate>About</span></a></li>
+            <li class="divider" aria-hidden="true"></li>
+            <li><a href="" ng-click="advanced()"><span class="fa fa-fw fa-cogs"></span>&nbsp;<span translate>Advanced</span></a></li>
+            <li><a href="" ng-click="logging.show()"><span class="fa fa-fw fa-book"></span>&nbsp;<span translate>Logs</span></a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  -->
+<section>
+	<div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4 p-0 mh90">
+                    <div class="prfl-hd">
+                            <img src="assets/img/user-img1.png" class="profile-img">
+                        <div class="name">
+                            <p><small>logged in as</small></p>
+                            <h4>John Q. Admin</h4>
+                        </div>
+                        <div class="rt-prt">
+                            <p>Admin</p>
+                            <a href="#" class="toggle-btn"><img src="assets/img/more-dots.png"></a>
+                            <div class="" id="myNavbar" aria-expanded="false">
+                                <ul class="">
+                                  <li class=""><a class="" href="setting.html">Settings</a></li>
+                                  <li class=""><a class="" href="#">About / version</a></li>
+                                  <li class=""><a class="" href="#">Contact Support</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 black-bg"></div>
+            </div>
+    	<div class="row vert-bor-container">
+        	<div class="col-md-4 p-0 brdr-rt">
+                <div class="d2b">
+                	<img src="assets/img/box.png" class="bx-img">
+                    <p>Source (This Device)</p>
+                </div>
+				<div class="panel panel-default" ng-repeat="deviceCfg in [thisDevice()]">
+                <!--/d2b-->
+				<div class="txt-hd">
+                	<div class="txt-lft">
+                    	<p class="n-hd"><identicon class="panel-icon" data-value="deviceCfg.deviceID"></identicon> Name</p>
+                        <p>{{deviceName(deviceCfg)}}</p> 
+                    </div>
+                    <div class="txt-rt">
+                    	<p>Status</p>
+                        <p class="h-txt">healthy</p>
+                    </div>
+                </div>
+                <!--/txt-hd-->
+                <div class="selected">
+                	<div class="lst-lft">
+                    	<ul>
+                            <li><span class="fa fa-fw fa-cloud-download"></span>&nbsp;<span translate>Download Rate</span></li>
+                            <li><span class="fa fa-fw fa-cloud-upload"></span>&nbsp;<span translate>Upload Rate</span></li>
+                            <li><span class="fa fa-fw fa-home"></span>&nbsp;<span translate>Local State (Total)</span></li>
+                            <li><span class="fa fa-fw fa-tachometer"></span>&nbsp;<span translate>CPU Utilization</span></li>
+                            <li><span class="fa fa-fw fa-sitemap"></span>&nbsp;<span translate>Listeners</span></li>
+                            <li><span class="fa fa-fw fa-map-signs"></span>&nbsp;<span translate>Discovery</span></li>
+                            <li><span class="fa fa-fw fa-clock-o"></span>&nbsp;<span translate>Uptime</span></li>
+                            <li><span class="fa fa-fw fa-tag"></span>&nbsp;<span translate>Version</span></li>
+                        </ul>
+                    </div>
+                    <div class="lst-rt">
+                    	<ul>
+                            <li>
+								<a href="#" class="toggler" ng-click="toggleUnits()">
+									<span ng-if="!metricRates">{{connectionsTotal.outbps | binary}}B/s</span>
+									<span ng-if="metricRates">{{connectionsTotal.outbps*8 | metric}}bps</span>
+									({{connectionsTotal.outBytesTotal | binary}}B)
+								</a>
+							</li>
+                            <li>
+								<span tooltip data-original-title="{{localStateTotal.files | alwaysNumber}} {{'files' | translate}}, {{ localStateTotal.directories | alwaysNumber}} {{'directories' | translate}}, ~{{ localStateTotal.bytes | binary}}B">
+								<span class="fa fa-files-o"></span>&nbsp;{{localStateTotal.files | alwaysNumber}}&ensp;
+								<span class="fa fa-folder-o"></span>&nbsp;{{localStateTotal.directories| alwaysNumber}}&ensp;
+								<span class="fa fa-hdd-o"></span>&nbsp;~{{localStateTotal.bytes | binary}}B
+							</li>
+                            <li>
+								{{system.sys | binary}}B
+							</li>
+                            <li>
+								{{system.cpuPercent | alwaysNumber | natural:1}}%
+							</li>
+                            <li>
+								<span ng-if="listenersFailed.length == 0" class="data text-success">
+									<span>{{listenersTotal}}/{{listenersTotal}}</span>
+								</span>
+								<span ng-if="listenersFailed.length != 0" class="data" ng-class="{'text-danger': listenersFailed.length == listenersTotal}">
+									<span popover data-trigger="hover" data-placement="bottom" data-html="true" data-content="{{listenersFailed.join('<br>\n')}}">
+										{{listenersTotal-listenersFailed.length}}/{{listenersTotal}}
+									</span>
+								</span>
+							</li>
+                            <li>
+								<span ng-if="discoveryFailed.length == 0" class="data text-success">
+									<span>{{discoveryTotal}}/{{discoveryTotal}}</span>
+								</span>
+								<span ng-if="discoveryFailed.length != 0" class="data" ng-class="{'text-danger': discoveryFailed.length == discoveryTotal}">
+									<span popover data-trigger="hover" data-placement="bottom" data-content="{{'Click to see discovery failures' | translate}}.">
+										<a href="" style="color:inherit" ng-click="showDiscoveryFailures()">{{discoveryTotal-discoveryFailed.length}}/{{discoveryTotal}}</a>
+									</span>
+								</span>							
+							</li>
+                            <li>
+								{{system.uptime | duration:"m"}}
+							</li>
+                            <li>
+								<span tooltip data-original-title="{{versionString()}}">{{versionString()}}</span>
+							</li>
+                        </ul>
+                    </div>
+                    <div class="lst-rt last">
+                    	<ul>
+                        	<li>&nbsp;</li>
+                            <li>Stats</li>
+                        </ul>
+                    </div>
+                    <a href="#" class="btm-btn">
+                        <img src="assets/img/ico1.png">
+                    </a>
+                </div>
+                <!--/selected-->
+                 </div>
+            </div>
+            <!--/col-md-4-->
+            <div class="col-md-8 p-0">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="aa-image">
+                                <div class="img1"><a href="#"><img src="assets/img/down-arrow.png" class="img-fluid mb-5"></a></div>
+                                <div class="img2"><a href="#"><img src="assets/img/refresh.png" class="img-fluid"></a></div>
+                            </div>
+                        </div>
+                       <div class="col-md-8">
+                            <div class="rt-section">
+                            	<img src="assets/img/triangle-arrow.png" class="arrow-img">
+                                <div class="d2b">
+                                    <img src="assets/img/box.png" class="bx-img">
+                                    <p class="m-0">Destination</p>
+                                </div>
+                                <!--/d2b-->
+                                <div class="txt-hd">
+                                    <div class="txt-lft">
+                                        <p class="n-hd">Name</p>
+                                        <p>Mr. Symply</p> 
+                                    </div>
+                                    <div class="txt-rt">
+                                        <p>Status</p>
+                                        <p class="h-txt">healthy</p>
+                                    </div>
+                                </div>
+                                <!--/txt-hd-->
+                                <div class="selected">
+                                    <div class="lst-lft">
+                                        <ul>
+                                            <li>Location</li>
+                                            <li>Ip Address</li>
+                                            <li>Inbound Rate</li>
+                                            <li>Outbound Rate</li>
+                                            <li>Uptime</li>
+                                            <li>Run Time</li>
+                                        </ul>
+                                    </div>
+                                    <div class="lst-rt">
+                                        <ul>
+                                            <li>Torrance CA, Rack 1</li>
+                                            <li>192.168.1.2</li>
+                                            <li>10bits/sec</li>
+                                            <li>0 bits/sec</li>
+                                            <li>17 days, 4 hrs, 3 min</li>
+                                            <li>36 minutes</li>
+                                        </ul>
+                                    </div>
+                                    <div class="lst-rt last">
+                                        <ul>
+                                            <li>&nbsp;</li>
+                                            <li>Stats</li>
+                                        </ul>
+                                    </div>
+                                    
+                                </div>
+                                <!--/selected-->
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <!--/row-->
+                </div>
+            </div>
+            <!--/col-md-8-->
+        </div>
+        <!--/row-->
+        <a href="#" class="bottom-button">
+            <img src="assets/img/question.png">
+        </a>
+    </div>
+</section>
+  </div> <!-- /container -->
+
+  <ng-include src="'syncthing/core/networkErrorDialogView.html'"></ng-include>
+  <ng-include src="'syncthing/core/httpErrorDialogView.html'"></ng-include>
+  <ng-include src="'syncthing/core/restartingDialogView.html'"></ng-include>
+  <ng-include src="'syncthing/core/upgradingDialogView.html'"></ng-include>
+  <ng-include src="'syncthing/core/shutdownDialogView.html'"></ng-include>
+  <ng-include src="'syncthing/device/idqrModalView.html'"></ng-include>
+  <ng-include src="'syncthing/device/editDeviceModalView.html'"></ng-include>
+  <ng-include src="'syncthing/device/globalChangesModalView.html'"></ng-include>
+  <ng-include src="'syncthing/folder/editFolderModalView.html'"></ng-include>
+  <ng-include src="'syncthing/folder/editIgnoresModalView.html'"></ng-include>
+  <ng-include src="'syncthing/folder/restoreVersionsModalView.html'"></ng-include>
+  <ng-include src="'syncthing/folder/restoreVersionsConfirmation.html'"></ng-include>
+  <ng-include src="'syncthing/settings/settingsModalView.html'"></ng-include>
+  <ng-include src="'syncthing/settings/advancedSettingsModalView.html'"></ng-include>
+  <ng-include src="'syncthing/usagereport/usageReportModalView.html'"></ng-include>
+  <ng-include src="'syncthing/usagereport/usageReportPreviewModalView.html'"></ng-include>
+  <ng-include src="'syncthing/transfer/neededFilesModalView.html'"></ng-include>
+  <ng-include src="'syncthing/transfer/failedFilesModalView.html'"></ng-include>
+  <ng-include src="'syncthing/transfer/remoteNeededFilesModalView.html'"></ng-include>
+  <ng-include src="'syncthing/core/majorUpgradeModalView.html'"></ng-include>
+  <ng-include src="'syncthing/core/aboutModalView.html'"></ng-include>
+  <ng-include src="'syncthing/core/discoveryFailuresModalView.html'"></ng-include>
+  <ng-include src="'syncthing/folder/removeFolderDialogView.html'"></ng-include>
+  <ng-include src="'syncthing/device/removeDeviceDialogView.html'"></ng-include>
+  <ng-include src="'syncthing/core/logViewerModalView.html'"></ng-include>
+
+  <!-- vendor scripts -->
+  <script type="text/javascript" src="vendor/jquery/jquery-2.2.2.js"></script>
+  <script type="text/javascript" src="vendor/angular/angular.js"></script>
+  <script type="text/javascript" src="vendor/angular/angular-sanitize.js"></script>
+  <script type="text/javascript" src="vendor/angular/angular-translate.js"></script>
+  <script type="text/javascript" src="vendor/angular/angular-translate-loader-static-files.js"></script>
+  <script type="text/javascript" src="vendor/angular/angular-dirPagination.js"></script>
+  <script type="text/javascript" src="vendor/moment/moment.js"></script>
+  <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.js"></script>
+  <script type="text/javascript" src="vendor/bootstrap/js/daterangepicker.js"></script>
+  <script type="text/javascript" src="vendor/fancytree/jquery.fancytree-all-deps.js"></script>
+  <!-- / vendor scripts -->
+
+  <!-- gui application code -->
+  <script type="text/javascript" src="syncthing/core/module.js"></script>
+  <script type="text/javascript" src="syncthing/core/alwaysNumberFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/basenameFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/binaryFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/durationFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/eventService.js"></script>
+  <script type="text/javascript" src="syncthing/core/identiconDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/languageSelectDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/lastErrorComponentFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/localeService.js"></script>
+  <script type="text/javascript" src="syncthing/core/modalDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/naturalFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/metricFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/notificationDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/pathIsSubDirDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/popoverDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/selectOnClickDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/syncthingController.js"></script>
+  <script type="text/javascript" src="syncthing/core/tooltipDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/uncamelFilter.js"></script>
+  <script type="text/javascript" src="syncthing/core/uniqueFolderDirective.js"></script>
+  <script type="text/javascript" src="syncthing/core/validDeviceidDirective.js"></script>
+  <script type="text/javascript" src="assets/lang/valid-langs.js"></script>
+  <script type="text/javascript" src="assets/lang/prettyprint.js"></script>
+  <script type="text/javascript" src="meta.js"></script>
+  <script type="text/javascript" src="syncthing/app.js"></script>
+  <!-- / gui application code -->
+  
+<script src="assets/js/nav.js" type="text/javascript"></script>
+<script>
+	$(document).ready(function(e) {
+            $(".toggle-btn").click(function(e) {
+                $("#myNavbar ul").toggle();
+                return false;
+            });
+            if($(document).width() > 767){
+               $('.vert-bor-container > [class*="col-"]').css('min-height', $(document).height()- 120 + 'px');
+            }
+    });
+    
+</script>
+<script type="text/javascript">
+			
+	$(document).ready( function() {
+		
+		jQuery('#fileTreeDemo_1').gsFileManager({ script: 'connectors/GsFileManager.php' });
+		
+	});
+</script>  
+
+</body>
+</html>
